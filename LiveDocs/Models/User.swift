@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import UIKit
 import Combine
 
 struct User: Identifiable, Codable {

@@ -29,9 +29,8 @@ class LandingViewModel: ObservableObject, Identifiable {
     
     init(coordinator: LandingCoordinator) {
         self.coordinator = coordinator
-        signupEmail = "test1@yahoo.com"
+        signupEmail = "test\(UUID().uuidString)@yahoo.com"
         signupPassword = "qwerty1234!"
-        displayName = "Big Nova"
     }
     
     func didAppear() {

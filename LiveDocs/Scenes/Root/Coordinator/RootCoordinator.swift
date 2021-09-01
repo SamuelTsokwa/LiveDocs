@@ -24,3 +24,10 @@ class RootCoordinator: ObservableObject, Identifiable {
     }
 
 }
+
+public enum CoordinatorTab: Int {
+    case one = 0
+    case two = 1
+    case three = 2
+    case four = 3
+}

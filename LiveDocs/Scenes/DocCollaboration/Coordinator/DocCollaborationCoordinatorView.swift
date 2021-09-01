@@ -30,7 +30,6 @@ struct DocCollaborationCoordinatorView: View {
                     Spacer()
                 }
             })
-            .allowFullScreenOverlays()
     }
 
 }

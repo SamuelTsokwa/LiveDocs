@@ -24,7 +24,6 @@ struct HomeCoordinatorView: View {
                     docCollaborationCoordinator in
                     DocCollaborationCoordinatorView(coordinator: docCollaborationCoordinator)
                 }
-                .allowFullScreenOverlays()
                 .onChange(of: deeplink.deeplink, perform: { deeplink in
                     guard let deeplink = deeplink else { return }
                     switch deeplink {

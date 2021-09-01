@@ -118,11 +118,11 @@ struct DocCollaborationView: View {
             }
             
         }
-        .interactiveModal(modalConfiguration: ModalConfiguration(isPresenting: $showSettingView, modalTitle: "Settings", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
+        .modal(modalConfiguration: ModalConfiguration(isPresenting: $showSettingView, modalTitle: "Settings", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
             settingsView
             
         }
-        .interactiveModal(modalConfiguration: ModalConfiguration(isPresenting: $showFontPicker, modalTitle: "Fonts", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
+        .modal(modalConfiguration: ModalConfiguration(isPresenting: $showFontPicker, modalTitle: "Fonts", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
             fontPicker
         }
         .onAppear(perform: {

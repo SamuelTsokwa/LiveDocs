@@ -156,7 +156,7 @@ struct HomeView: View {
                 
             }
         }
-        .interactiveModal(modalConfiguration: ModalConfiguration(isPresenting: $showModal, modalTitle: "New Document", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
+        .modal(modalConfiguration: ModalConfiguration(isPresenting: $showModal, modalTitle: "New Document", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
             
             VStack {
                 
