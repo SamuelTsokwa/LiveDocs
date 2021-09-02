@@ -104,6 +104,7 @@ struct TextView: UIViewRepresentable {
 
             if let range = textView.selectedRange {
                 self.range.wrappedValue = range
+                print("range:", range)
                 if self.range.wrappedValue.length == 0 {
 //                    ensureCursorVisible(textView: textView)
                 }
@@ -116,21 +117,21 @@ struct TextView: UIViewRepresentable {
 
         }
         
-        func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-            timer?.invalidate()
-            timer = Timer.scheduledTimer(
-                timeInterval: 0.5,
-                target: self,
-                selector: #selector(textViewDidStopTyping),
-                userInfo: ["textField": textView],
-                repeats: false)
-                return true
-        }
+//        func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+//            timer?.invalidate()
+//            timer = Timer.scheduledTimer(
+//                timeInterval: 0.5,
+//                target: self,
+//                selector: #selector(textViewDidStopTyping),
+//                userInfo: ["textField": textView],
+//                repeats: false)
+//                return true
+//        }
         
-        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-            
-                return false
-            }
+//        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+//            
+//                return false
+//            }
         
         @objc func textViewDidStopTyping(timer: Timer) {
            

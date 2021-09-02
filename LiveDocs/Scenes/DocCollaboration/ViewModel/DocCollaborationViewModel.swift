@@ -25,6 +25,7 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     @Published var showCopied = false
     @Published var docText: NSMutableAttributedString
     @Published var range: NSRange = NSRange()
+    @Published var tempRange: NSRange = NSRange()
     @Published var defaultFont: UIFont = UIFont(name: "TimesNewRomanPSMT", size: 16) ?? .systemFont(ofSize: 16)
     @Published var defaultColor: UIColor = .white
     @Published var allFonts: [String] = []
@@ -56,6 +57,7 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     @Published var isHighlightedTextItalic = false
     @Published var isHighlightedTextUnderlined = false
     @Published var isHighlightedTextLink = false
+    @Published var isHighlightedTextPainted = false
     
     init(coordinator: DocCollaborationCoordinator, documentState: DocumentState) {
         
@@ -181,17 +183,11 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     }
     
     private func applyLink() {
-        if range.length != 0 {
-            let newAttribute = docText
-            newAttribute.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
-            newAttribute.addAttribute(.link, value: linkURL, range: range)
-            newAttribute.addAttribute(.foregroundColor, value: UIColor.link, range: range)
-            docText = newAttribute
-           
-        }
-        
+        print(tempRange.length, tempRange.location)
+        docText.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: tempRange)
+        docText.addAttribute(.link, value: linkURL, range: tempRange)
+        docText.addAttribute(.foregroundColor, value: UIColor.link, range: tempRange)
         linkURL = ""
-        
     }
     
     func removeLink() {
@@ -203,6 +199,13 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
         }
         
         linkURL = ""
+    }
+    
+    func removeHighlightedTextPaint() {
+        docText.removeAttribute(.backgroundColor, range: range)
+        
+        isHighlightedTextPainted = false
+        highlightedTextHighlightColor = .white
     }
     
     func openLink() {
@@ -272,6 +275,8 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
             if let value = value {
                 guard let color = (value as? UIColor) else { return }
                 highlightedTextHighlightColor = color.color
+            } else {
+                highlightedTextHighlightColor = .white
             }
         }
     }
@@ -337,6 +342,20 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
         }
         
     }
+    
+    func isHighlightedPainted() {
+        
+        docText.enumerateAttribute(.backgroundColor , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if (value as? UIColor) != nil {
+                isHighlightedTextPainted = true
+            } else {
+                isHighlightedTextPainted = false
+            }
+        }
+        
+    }
+    
+    
     
     func isHighlightedLink() {
         

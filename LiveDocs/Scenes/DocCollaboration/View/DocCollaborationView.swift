@@ -176,6 +176,9 @@ struct DocCollaborationView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
                 .padding(.top, 20)
+                .onAppear(perform: {
+                    viewModel.tempRange = viewModel.range
+                })
             
             if viewModel.isHighlightedTextLink {
                 Divider()
@@ -205,11 +208,13 @@ struct DocCollaborationView: View {
                             
             
             Button {
-                showLinkSetter = false
+                
                 if viewModel.isHighlightedTextLink {
                     viewModel.removeLink()
+                    showLinkSetter = false
                 } else {
                     viewModel.applyAttribute(attributeType: .link)
+                    showLinkSetter = false
                 }
 
                                     
@@ -847,7 +852,13 @@ struct DocCollaborationView: View {
                 Spacer()
                 
                 Button {
-                    showHighlightColorPicker = true
+                    viewModel.isHighlightedPainted()
+                    if viewModel.isHighlightedTextPainted {
+                        viewModel.removeHighlightedTextPaint()
+                    } else {
+                        showHighlightColorPicker = true
+                    }
+                    
                 } label: {
                     Image("highlight")
                         .resizable()
