@@ -183,10 +183,21 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     }
     
     private func applyLink() {
-        print(tempRange.length, tempRange.location)
         docText.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: tempRange)
         docText.addAttribute(.link, value: linkURL, range: tempRange)
         docText.addAttribute(.foregroundColor, value: UIColor.link, range: tempRange)
+        linkURL = ""
+    }
+    
+    func editLink() {
+        docText.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: tempRange)
+        docText.addAttribute(.link, value: linkURL, range: tempRange)
+        docText.addAttribute(.foregroundColor, value: UIColor.link, range: tempRange)
+        
+        docText.removeAttribute(.underlineStyle, range: range)
+        docText.removeAttribute(.link, range: range)
+        docText.removeAttribute(.foregroundColor, range: range)
+        
         linkURL = ""
     }
     

@@ -228,6 +228,23 @@ struct DocCollaborationView: View {
             .padding(.vertical)
             .buttonStyle(FilledButtonStyle(color: .appAccent, cornerRadius: 25, padding: 15))
             
+            if viewModel.isHighlightedTextLink {
+                Button {
+                    viewModel.editLink()
+                    showLinkSetter = false
+                    
+                } label: {
+                    Text("Edit")
+                        .bold()
+                        .foregroundColor(.white)
+                }
+                .frame(height: 50)
+                .padding(.horizontal, 20)
+                .padding(.vertical)
+                .buttonStyle(FilledButtonStyle(color: .appAccent, cornerRadius: 25, padding: 15))
+            }
+            
+            
         }
         .padding(.vertical)
     }

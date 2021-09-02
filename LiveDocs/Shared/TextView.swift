@@ -104,7 +104,6 @@ struct TextView: UIViewRepresentable {
 
             if let range = textView.selectedRange {
                 self.range.wrappedValue = range
-                print("range:", range)
                 if self.range.wrappedValue.length == 0 {
 //                    ensureCursorVisible(textView: textView)
                 }
