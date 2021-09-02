@@ -127,6 +127,11 @@ struct TextView: UIViewRepresentable {
                 return true
         }
         
+        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+            
+                return false
+            }
+        
         @objc func textViewDidStopTyping(timer: Timer) {
            
             guard let userInfo = timer.userInfo as? [String: UITextView] else { return  }

@@ -35,7 +35,6 @@
 		3DB1CFC226DECAEA0034D950 /* RootViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB1CFBC26DECAEA0034D950 /* RootViewModel.swift */; };
 		3DB1CFC326DECAEA0034D950 /* RootCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB1CFBE26DECAEA0034D950 /* RootCoordinatorView.swift */; };
 		3DB1CFC426DECAEA0034D950 /* RootCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB1CFBF26DECAEA0034D950 /* RootCoordinator.swift */; };
-		3DB1CFC526DECAEA0034D950 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB1CFC126DECAEA0034D950 /* RootView.swift */; };
 		3DB1CFC826DECC280034D950 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 3DB1CFC726DECC280034D950 /* FirebaseFirestore */; };
 		3DB1CFCA26DECC280034D950 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 3DB1CFC926DECC280034D950 /* FirebaseDatabase */; };
 		3DB1CFCC26DECC280034D950 /* FirebaseFirestoreSwift-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 3DB1CFCB26DECC280034D950 /* FirebaseFirestoreSwift-Beta */; };
@@ -98,7 +97,6 @@
 		3DB1CFBC26DECAEA0034D950 /* RootViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootViewModel.swift; sourceTree = "<group>"; };
 		3DB1CFBE26DECAEA0034D950 /* RootCoordinatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootCoordinatorView.swift; sourceTree = "<group>"; };
 		3DB1CFBF26DECAEA0034D950 /* RootCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootCoordinator.swift; sourceTree = "<group>"; };
-		3DB1CFC126DECAEA0034D950 /* RootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		3DB1CFD526DECC580034D950 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -364,7 +362,6 @@
 		3DB1CFC026DECAEA0034D950 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				3DB1CFC126DECAEA0034D950 /* RootView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -523,7 +520,6 @@
 				3DB1CF7B26DEC7E20034D950 /* Document.swift in Sources */,
 				3DB1CFA826DECA210034D950 /* DocCollaborationCoordinatorView.swift in Sources */,
 				3DB1CFA626DECA210034D950 /* DocCollaborationViewModel.swift in Sources */,
-				3DB1CFC526DECAEA0034D950 /* RootView.swift in Sources */,
 				3DB1CFA726DECA210034D950 /* DocCollaborationCoordinator.swift in Sources */,
 				3DB1CF8026DEC8690034D950 /* AppColors.swift in Sources */,
 				3DB1CF4F26DEC7870034D950 /* LiveDocsApp.swift in Sources */,

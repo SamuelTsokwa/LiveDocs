@@ -21,6 +21,7 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     let db = Firestore.firestore()
     @Published var showSaved = false
     @Published var liveMode = true
+    @Published var linkURL = ""
     @Published var showCopied = false
     @Published var docText: NSMutableAttributedString
     @Published var range: NSRange = NSRange()
@@ -35,6 +36,8 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     // text color Attributes
     @Published var textColor: Color = .white
     @Published var highlightedColor: Color = .white
+    @Published var textHighlightColor: Color = .white
+    @Published var highlightedTextHighlightColor: Color = .white
     
     // text font Attributes
     @Published var font: UIFont = UIFont(name: "TimesNewRomanPSMT", size: 16) ?? .systemFont(ofSize: 16)
@@ -47,6 +50,12 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     // text font Attributes
     @Published var lineSpacing: CGFloat = 4
     @Published var highlightedlineSpacing: CGFloat = 4
+    
+    //text font Attributes
+    @Published var isHighlightedTextBold = false
+    @Published var isHighlightedTextItalic = false
+    @Published var isHighlightedTextUnderlined = false
+    @Published var isHighlightedTextLink = false
     
     init(coordinator: DocCollaborationCoordinator, documentState: DocumentState) {
         
@@ -97,10 +106,14 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
                 applyItalics()
             case .underline:
                 applyUnderline()
+            case .link:
+                applyLink()
         }
     }
     
-    func applyTextColor() {
+    
+    
+    private func applyTextColor() {
         
         if range.length != 0 {
             let newAttribute = docText
@@ -112,7 +125,7 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
         
     }
     
-    func applyFont() {
+    private func applyFont() {
         if range.length != 0 {
             let newAttribute = docText
             newAttribute.addAttribute(.font, value: highlightedFont, range: range)
@@ -123,7 +136,7 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
         
     }
     
-    func applyFontSize() {
+    private func applyFontSize() {
         
         if range.length != 0 {
             let newAttribute = docText
@@ -136,28 +149,129 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
         textView.font = newFont
     }
     
-    func applyHighlightColor() {
-        docText.addAttribute(.foregroundColor, value: textColor, range: range)
+    private func applyHighlightColor() {
+        if range.length != 0 {
+            let newAttribute = docText
+            newAttribute.addAttribute(.backgroundColor, value: UIColor(textHighlightColor), range: range)
+            docText = newAttribute
+        }
+        
+        textView.font = font
     }
     
-    func applyBold() {
-        docText.addAttribute(.foregroundColor, value: textColor, range: range)
+    private func applyBold() {
+        var newFont: UIFont
+        
+        if range.length != 0 {
+            isHighlightedBold()
+            if isHighlightedTextBold {
+                newFont = highlightedFont.removeTrait(traits: .traitBold)
+                docText.addAttribute(.font, value: newFont, range: range)
+                isHighlightedTextBold = false
+                
+            } else {
+                newFont = highlightedFont.bold
+                docText.addAttribute(.font, value: newFont, range: range)
+                isHighlightedTextBold = true
+            }
+        }
+        
+        isHighlightedItalic()
+        isHighlightedUnderlined()
     }
     
-    func applyItalics() {
-        docText.addAttribute(.foregroundColor, value: textColor, range: range)
+    private func applyLink() {
+        if range.length != 0 {
+            let newAttribute = docText
+            newAttribute.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+            newAttribute.addAttribute(.link, value: linkURL, range: range)
+            newAttribute.addAttribute(.foregroundColor, value: UIColor.link, range: range)
+            docText = newAttribute
+           
+        }
+        
+        linkURL = ""
+        
     }
     
-    func applyUnderline() {
-        docText.addAttribute(.foregroundColor, value: textColor, range: range)
+    func removeLink() {
+        isHighlightedLinkBool()
+        if isHighlightedTextLink {
+            docText.removeAttribute(.underlineStyle, range: range)
+            docText.removeAttribute(.link, range: range)
+            docText.removeAttribute(.foregroundColor, range: range)
+        }
+        
+        linkURL = ""
     }
     
+    func openLink() {
+        guard let url = URL(string: linkURL) else { return  }
+        UIApplication.shared.open(url)
+    }
+    
+    private func applyItalics() {
+        var newFont: UIFont
+        
+        if range.length != 0 {
+            isHighlightedItalic()
+            if isHighlightedTextItalic {
+                newFont = highlightedFont.removeTrait(traits: .traitItalic)
+                docText.addAttribute(.font, value: newFont, range: range)
+                isHighlightedTextItalic = false
+                
+            } else {
+                
+                newFont = highlightedFont.italic
+                docText.addAttribute(.font, value: newFont, range: range)
+                isHighlightedTextItalic = true
+            }
+            
+            
+        }
+        
+        isHighlightedBold()
+        isHighlightedUnderlined()
+
+    }
+    
+    private func applyUnderline() {
+        isHighlightedUnderlined()
+        if range.length != 0 {
+            if isHighlightedTextUnderlined {
+                docText.removeAttribute(.underlineStyle, range: range)
+                isHighlightedTextUnderlined = false
+            } else {
+                let newAttribute = docText
+                newAttribute.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+                docText = newAttribute
+                isHighlightedTextUnderlined = true
+            }
+            
+            
+        }
+        
+        isHighlightedBold()
+        isHighlightedItalic()
+
+    }
+
     func getHighlightedTextColor() {
 
         docText.enumerateAttribute(.foregroundColor , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
             if let value = value {
                 guard let color = (value as? UIColor) else { return }
                 highlightedColor = color.color
+            }
+        }
+    }
+    
+    func getTextBackgroundColor() {
+
+        docText.enumerateAttribute(.backgroundColor , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if let value = value {
+                guard let color = (value as? UIColor) else { return }
+                highlightedTextHighlightColor = color.color
             }
         }
     }
@@ -170,6 +284,69 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
                 highlightedFont = font
             }
         }
+    }
+    
+    func getHighlightedTextFontSize() {
+
+        docText.enumerateAttribute(.font , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if let value = value {
+                guard let font = (value as? UIFont) else { return }
+                highlightedFontSize = font.pointSize
+            }
+        }
+    }
+    
+    func isHighlightedBold() {
+        docText.enumerateAttribute(.font , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if let value = value {
+                guard let font = (value as? UIFont) else { return }
+                
+                isHighlightedTextBold = font.isBold
+            }
+        }
+    }
+    
+    func isHighlightedItalic() {
+        docText.enumerateAttribute(.font , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if let value = value {
+                guard let font = (value as? UIFont) else { return }
+                
+                isHighlightedTextItalic = font.isItalic
+            }
+        }
+    }
+    
+    func isHighlightedUnderlined() {
+        
+        docText.enumerateAttributes(in: range, options: [.longestEffectiveRangeNotRequired]) { (dict, range, value) in
+            if dict.keys.contains(.underlineStyle) {
+                isHighlightedTextUnderlined = true
+            } else {
+                isHighlightedTextUnderlined = false
+            }
+        }
+        
+    }
+    
+    func isHighlightedLinkBool() {
+        
+        docText.enumerateAttribute(.link , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if (value as? String) != nil {
+                isHighlightedTextLink = true
+            }
+        }
+        
+    }
+    
+    func isHighlightedLink() {
+        
+        docText.enumerateAttribute(.link , in: range, options: [.longestEffectiveRangeNotRequired]) { value, range, isStop in
+            if let value = value as? String {
+                linkURL = value
+                isHighlightedTextLink = true
+            }
+        }
+        
     }
     
     func saveText() {
@@ -218,7 +395,7 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     }
     
     func createSharableCode() {
-        let code = "novadocs://base?doc=\(CurrentUser.shared.currentUser.id)&id=\(documentState.currentDocument.id)"
+        let code = "livedocs://base?doc=\(CurrentUser.shared.currentUser.id)&id=\(documentState.currentDocument.id)"
         UIPasteboard.general.string = code
         showCopied = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -349,7 +526,6 @@ class DocCollaborationViewModel: ObservableObject, Identifiable {
     
     
     func didEndTyping(cursor: CGRect) {
-        
         if liveMode {
             
             let archivedData: Data = try! NSKeyedArchiver.archivedData(withRootObject: docText, requiringSecureCoding: false)
@@ -391,6 +567,7 @@ enum AttributeType: CaseIterable {
     case bold
     case italics
     case underline
+    case link
 }
 
 extension AttributeType {
@@ -410,6 +587,8 @@ extension AttributeType {
                 return  "Italics"
             case .underline:
                 return "Underline"
+            case .link:
+                return "link"
         }
         
     }
@@ -430,6 +609,9 @@ extension AttributeType {
                 return  "italics"
             case .underline:
                 return "underline"
+            case .link:
+                return "link"
         }
     }
 }
+

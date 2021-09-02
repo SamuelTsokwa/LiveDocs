@@ -25,7 +25,9 @@ struct DocCollaborationView: View {
     @State var showEdit = true
     @State var showSettingView = false
     @State var showColorPicker = false
+    @State var showHighlightColorPicker = false
     @State var showFontPicker = false
+    @State var showLinkSetter = false
     @State var gridLayout = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
    
 
@@ -55,7 +57,7 @@ struct DocCollaborationView: View {
                         .frame(height: height)
                         .padding()
                         .padding(.bottom, keyboard.currentHeight > 0 ? keyboard.currentHeight : 0)
-                        .padding(.bottom, showMenu ? constantKeyboardHeight : 0)
+                        .padding(.bottom, showMenu ?  500 : 0)
                         .edgesIgnoringSafeArea(.all)
 //                        .overlay(
 //                            collaboratorCursors
@@ -118,12 +120,40 @@ struct DocCollaborationView: View {
             }
             
         }
+        .sheet(isPresented: $showHighlightColorPicker) {
+            VStack {
+                
+                HStack {
+                    Spacer ()
+                    
+                    Button {
+                        showHighlightColorPicker.toggle()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.white)
+                            .imageScale(.large)
+                            .padding(.all)
+                    }
+
+                }
+                
+                ColorPickerWellView(selectedColor: $viewModel.textHighlightColor) {
+                    withAnimation {
+                        viewModel.applyAttribute(attributeType: .highlightColor)
+                    }
+                }
+            }
+            
+        }
         .modal(modalConfiguration: ModalConfiguration(isPresenting: $showSettingView, modalTitle: "Settings", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
             settingsView
             
         }
         .modal(modalConfiguration: ModalConfiguration(isPresenting: $showFontPicker, modalTitle: "Fonts", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
             fontPicker
+        }
+        .modal(modalConfiguration: ModalConfiguration(isPresenting: $showLinkSetter, modalTitle: "Link", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
+            addLink
         }
         .onAppear(perform: {
             viewModel.didAppear()
@@ -134,6 +164,67 @@ struct DocCollaborationView: View {
         
         
 
+    }
+    
+    var addLink: some View {
+        VStack {
+            
+            TextfieldWithoutBorder(text: $viewModel.linkURL, placeholder: "URL", textColor: .white)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .frame(height: 50)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+                .padding(.top, 20)
+            
+            if viewModel.isHighlightedTextLink {
+                Divider()
+                    .background(Color.gray)
+                    .padding(.horizontal)
+                
+                Button {
+                    viewModel.openLink()
+                } label: {
+                    HStack {
+                        Text("Open link")
+                            .foregroundColor(.white)
+
+                            
+                    }
+                    .padding(.vertical, 10)
+                    
+                }
+                .padding(.horizontal)
+                
+                
+                Divider()
+                    .background(Color.gray)
+                    .padding(.horizontal)
+            }
+            
+                            
+            
+            Button {
+                showLinkSetter = false
+                if viewModel.isHighlightedTextLink {
+                    viewModel.removeLink()
+                } else {
+                    viewModel.applyAttribute(attributeType: .link)
+                }
+
+                                    
+            } label: {
+                Text(viewModel.isHighlightedTextLink ? "Remove": "Add")
+                    .bold()
+                    .foregroundColor(.white)
+            }
+            .frame(height: 50)
+            .padding(.horizontal, 20)
+            .padding(.vertical)
+            .buttonStyle(FilledButtonStyle(color: .appAccent, cornerRadius: 25, padding: 15))
+            
+        }
+        .padding(.vertical)
     }
     
     var collaboratorCursors: some View {
@@ -389,6 +480,12 @@ struct DocCollaborationView: View {
                         if viewModel.range.length != 0 {
                             viewModel.getHighlightedTextColor()
                             viewModel.getHighlightedTextFont()
+                            viewModel.getHighlightedTextFontSize()
+                            viewModel.isHighlightedBold()
+                            viewModel.isHighlightedItalic()
+                            viewModel.isHighlightedUnderlined()
+                            viewModel.isHighlightedLink()
+                            viewModel.getTextBackgroundColor()
                         }
                         
                     }, label: {
@@ -407,6 +504,10 @@ struct DocCollaborationView: View {
                         textView.resignFirstResponder()
                         showEdit = true
                         showMenu = false
+                        viewModel.isHighlightedTextBold = false
+                        viewModel.isHighlightedTextItalic = false
+                        viewModel.isHighlightedTextUnderlined = false
+                        viewModel.isHighlightedTextLink = false
 
                     }, label: {
                         Image("checkmark")
@@ -666,39 +767,96 @@ struct DocCollaborationView: View {
         VStack(alignment: .leading) {
             HStack {
                 
-                Image("bold")
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(.white)
-                    .frame(width: 30, height: 30)
-                    .padding(.horizontal)
+                Button {
+                    viewModel.applyAttribute(attributeType: .bold)
+                } label: {
+                    Image("bold")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.white)
+                        .frame(width: 30, height: 30)
+                        .padding(viewModel.isHighlightedTextBold ? 3: 0)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(viewModel.isHighlightedTextBold ? Color.darkBackgroundColor: Color.clear)
+                        )
+                        .padding(.horizontal)
+                        
+                }
+                
+                
                 
                 Spacer()
                 
-                Image("italic")
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(.white)
-                    .frame(width: 30, height: 30)
-                    .padding(.horizontal)
+                Button {
+                    viewModel.applyAttribute(attributeType: .italics)
+                } label: {
+                    Image("italic")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.white)
+                        .frame(width: 30, height: 30)
+                        .padding(viewModel.isHighlightedTextItalic ? 3: 0)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(viewModel.isHighlightedTextItalic ? Color.darkBackgroundColor: Color.clear)
+                        )
+                        .padding(.horizontal)
+                }
+                
+                
                 
                 Spacer()
                 
-                Image("underlined")
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(.white)
-                    .frame(width: 30, height: 30)
-                    .padding(.horizontal)
+                Button {
+                    viewModel.applyAttribute(attributeType: .underline)
+                } label: {
+                    Image("underlined")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.white)
+                        .frame(width: 30, height: 30)
+                        .padding(viewModel.isHighlightedTextUnderlined ? 3 : 0)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(viewModel.isHighlightedTextUnderlined ? Color.darkBackgroundColor: Color.clear)
+                        )
+                        .padding(.horizontal)
+                }
+                
                 
                 Spacer()
                 
-                Image("highlight")
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(.white)
-                    .frame(width: 30, height: 30)
-                    .padding(.horizontal)
+                Button {
+                    showLinkSetter = true
+                } label: {
+                    Image("link")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.white)
+                        .frame(width: 30, height: 30)
+                        .padding(3)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(viewModel.isHighlightedTextLink ? Color.darkBackgroundColor: Color.clear)
+                        )
+                        .padding(.horizontal)
+                }
+                
+                
+                Spacer()
+                
+                Button {
+                    showHighlightColorPicker = true
+                } label: {
+                    Image("highlight")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(viewModel.range.length != 0 ? viewModel.highlightedTextHighlightColor: .white)
+                        .frame(width: 30, height: 30)
+                        .padding(.horizontal)
+                }
+
             }
             
             .padding(.vertical, 8)

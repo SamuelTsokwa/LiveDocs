@@ -14,12 +14,12 @@ struct Document: Identifiable, Equatable {
         lhs.id == rhs.id
     }
     
-    let id: String
-    let saved: Bool
-    let author: String
-    let createdBy: String
-    let createdAt: Date
-    let title: String
+    var id: String
+    var saved: Bool
+    var author: String
+    var createdBy: String
+    var createdAt: Date
+    var title: String
     var collaborators: [User]?
     var content: NSMutableAttributedString
 

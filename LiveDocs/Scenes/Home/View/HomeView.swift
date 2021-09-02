@@ -17,6 +17,7 @@ struct HomeView: View {
     @State var showModal = false
     
     
+    
     var body: some View {
         ZStack {
             ScrollView {
@@ -64,11 +65,18 @@ struct HomeView: View {
                         
                         LazyVStack {
                             ForEach(Array(viewModel.myDocuments.values), id: \.id) { doc in
-                                DocumentListItem(document: doc)
+                                DocumentListItem(document: doc) {
+                                    viewModel.toDocCollaborationView(doc)
+                                } deleteAction: { doc in
+                                    viewModel.deleteDoc(doc: doc)
+                                } copyLinkAction: { doc in
+                                    viewModel.createSharableCode(doc: doc)
+                                } duplicateAction: { doc in
+                                    viewModel.duplicateDoc(doc: doc)
+                                } editTitleAction: { doc in
+                                    viewModel.editDocumentName(doc: doc)
+                                }
                                     .padding(.bottom)
-                                    .onTapGesture {
-                                        viewModel.toDocCollaborationView(doc)
-                                    }
                             }
                         }
                         .padding(.horizontal)
@@ -156,6 +164,41 @@ struct HomeView: View {
                 
             }
         }
+        .modal(modalConfiguration: ModalConfiguration(isPresenting: $viewModel.showEditNameModal, modalTitle: "Edit Title", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
+            
+            VStack {
+                
+                TextfieldWithoutBorder(text: $viewModel.newDocumentTitle, placeholder: "Title", textColor: .white)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .frame(height: 50)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+                    .padding(.top, 20)
+                                
+                
+                Button {
+                    
+                    viewModel.showEditNameModal = false
+                    viewModel.changeTitle()
+                    
+                    
+                                        
+                } label: {
+                    Text("Change")
+                        .bold()
+                        .foregroundColor(.white)
+                }
+                .frame(height: 50)
+                .padding(.horizontal, 20)
+                .padding(.vertical)
+                .buttonStyle(FilledButtonStyle(color: .appAccent, cornerRadius: 25, padding: 15))
+                
+            }
+            .padding(.vertical)
+            
+            
+        }
         .modal(modalConfiguration: ModalConfiguration(isPresenting: $showModal, modalTitle: "New Document", backgroundColor: .darkBackgroundColor, exitButtonColor: .white)) {
             
             VStack {
@@ -189,13 +232,18 @@ struct HomeView: View {
             
         }
         
-        
     }
 
 }
 
 struct DocumentListItem: View {
     let document: Document
+    let action: () -> Void
+    let deleteAction: (_ document: Document) -> Void
+    let copyLinkAction: (_ document: Document) -> Void
+    let duplicateAction: (_ document: Document) -> Void
+    let editTitleAction: (_ document: Document) -> Void
+    
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
@@ -205,6 +253,9 @@ struct DocumentListItem: View {
                     .frame(height: 100)
                     .background(Color.darkBackgroundColor)
                     .padding(.horizontal, 8)
+                    .onTapGesture {
+                        action()
+                    }
                 
                 Divider()
                     .background(Color.gray)
@@ -212,24 +263,55 @@ struct DocumentListItem: View {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
-                        Text(document.title)
-                            .foregroundColor(.white)
-                            .font(.system(size: 20, weight: .bold, design: .default))
+                        Group {
+                            Text(document.title)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20, weight: .bold, design: .default))
+                            
+                            Image("cloud")
+                                .resizable()
+                                .renderingMode(.template)
+                                .foregroundColor(.white)
+                                .frame(width: 15, height: 15)
+                        }
+                        .onTapGesture {
+                            action()
+                        }
                         
-                        Image("cloud")
-                            .resizable()
-                            .renderingMode(.template)
-                            .foregroundColor(.white)
-                            .frame(width: 15, height: 15)
+                        
+                        Spacer()
+                       
+                        Menu {
+                            Button("Delete", action: {deleteAction(document)})
+                            Button("Copy link", action: {copyLinkAction(document)})
+                            Button("Duplicate", action: {duplicateAction(document)})
+                            Button("Edit Title", action: {editTitleAction(document)})
+                            
+                        } label: {
+                            Label(
+                                title: { Text("") },
+                                icon: { Image("options")
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .foregroundColor(.white)
+                                    .frame(width: 30, height: 30)
+                                })
+                        }
                     }
                     
-                    Text(document.author)
-                        .foregroundColor(.white)
-                        .font(.system(size: 18, weight: .regular, design: .default))
+                    Group {
+                        Text(document.author)
+                            .foregroundColor(.white)
+                            .font(.system(size: 18, weight: .regular, design: .default))
+                        
+                        Text(document.dateAsString)
+                            .foregroundColor(.gray)
+                            .font(.system(size: 16, weight: .light, design: .default))
+                    }.onTapGesture {
+                        action()
+                    }
                     
-                    Text(document.dateAsString)
-                        .foregroundColor(.gray)
-                        .font(.system(size: 16, weight: .light, design: .default))
+                    
                 }
                 .padding(.horizontal, 8)
                 
@@ -243,7 +325,6 @@ struct DocumentListItem: View {
         )
     }
    
-
 }
 
 struct SharedWithMe: View {

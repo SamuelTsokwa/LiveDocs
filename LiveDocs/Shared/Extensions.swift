@@ -72,3 +72,35 @@ extension EnvironmentValues {
         }
     }
 }
+
+extension UIFont {
+    func withTraits(traits:UIFontDescriptor.SymbolicTraits) -> UIFont {
+        var symTraits = fontDescriptor.symbolicTraits
+        symTraits.insert(traits)
+        let descriptor = fontDescriptor.withSymbolicTraits(symTraits)
+        return UIFont(descriptor: descriptor!, size: 0) //size 0 means keep the size as it is
+    }
+    
+    func removeTrait(traits:UIFontDescriptor.SymbolicTraits) -> UIFont {
+        var symTraits = fontDescriptor.symbolicTraits
+        symTraits.remove(traits)
+        let descriptor = fontDescriptor.withSymbolicTraits(symTraits)
+        return UIFont(descriptor: descriptor!, size: 0) //size 0 means keep the size as it is
+    }
+
+    var bold: UIFont {
+        withTraits(traits: .traitBold)
+    }
+
+    var italic: UIFont {
+        withTraits(traits: .traitItalic)
+    }
+    
+    var isBold: Bool {
+        return self.fontDescriptor.symbolicTraits.contains(.traitBold)
+    }
+    
+    var isItalic: Bool {
+        return self.fontDescriptor.symbolicTraits.contains(.traitItalic)
+    }
+}

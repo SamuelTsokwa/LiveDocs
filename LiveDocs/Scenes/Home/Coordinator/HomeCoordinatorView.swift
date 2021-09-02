@@ -13,7 +13,6 @@ import SwiftUIKit
 struct HomeCoordinatorView: View {
 
     @ObservedObject var coordinator: HomeCoordinator
-//    @Environment(\.deeplink) var deeplink
     @EnvironmentObject var deeplink: Deeplinker
     
     var body: some View {
@@ -33,9 +32,7 @@ struct HomeCoordinatorView: View {
                         case .home:
                             break
                     }
-                    
                  })
-                
         }
     }
 

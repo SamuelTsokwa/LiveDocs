@@ -13,12 +13,15 @@ class HomeViewModel: ObservableObject, Identifiable {
     private unowned let coordinator: HomeCoordinator
     let documentState: DocumentState
     let db = Firestore.firestore()
+    var currentDocument: Document?
     @Published var myDocuments =  [String:Document]()
     @Published var sharedWithMe =  [String:Document]()
     @Published var newDocumentTitle = "untitled"
     @Published var newDocumentAuthor = ""
     @Published var isLoading = true
     @Published var showEmptyState = true
+    @Published var showEditNameModal = false
+    
     
     
     init(coordinator: HomeCoordinator, documentState: DocumentState) {
@@ -132,6 +135,86 @@ class HomeViewModel: ObservableObject, Identifiable {
             }
     }
     
+    func deleteDoc(doc: Document) {
+        db.collection(Endpoints.DOCUMENT_ENDPOINT).document(CurrentUser.shared.currentUser.id)
+            .collection(Endpoints.DOCUMENT_ENDPOINT)
+            .document(doc.id)
+            .delete()
+            { err in
+                if let err = err {
+                    print("Error removing document: \(err)")
+                } else {
+                    self.myDocuments.removeValue(forKey: doc.id)
+                    print("Document successfully removed!")
+                    
+                }
+            } 
+    }
+    
+    func createSharableCode(doc: Document) {
+        let code = "livedocs://base?doc=\(doc.createdBy)&id=\(doc.id)"
+        UIPasteboard.general.string = code
+        
+    }
+    
+    func editDocumentName(doc: Document) {
+        showEditNameModal = true
+        newDocumentTitle = doc.title
+        currentDocument = doc
+    }
+    
+    func changeTitle() {
+        guard let currentDocument = currentDocument else {return}
+        db.collection(Endpoints.DOCUMENT_ENDPOINT).document(currentDocument.createdBy)
+            .collection(Endpoints.DOCUMENT_ENDPOINT)
+            .document(currentDocument.id)
+            .setData([ "title": "\(newDocumentTitle)" ], merge: true)
+        newDocumentTitle = "untitled"
+        
+        
+    }
+    
+    func duplicateDoc(doc: Document) {
+        let archivedData: Data = try! NSKeyedArchiver.archivedData(withRootObject: doc.content, requiringSecureCoding: false)
+        var newDoc = doc
+        newDoc.id =  UUID().uuidString
+        newDoc.createdAt = Date()
+        
+        let data: [String : Any] = ["saved": true, "id": newDoc.id, "author": newDoc.author, "createdAt": newDoc.createdAt , "title": "\(newDoc.title)-copy", "content": archivedData, "createdBy": newDoc.createdBy]
+        
+        let path = db.collection(Endpoints.DOCUMENT_ENDPOINT).document(newDoc.createdBy)
+            
+        path.setData(["test" : ""])
+            { err in
+                if let err = err {
+                    print("Error writing document: \(err)")
+                }
+                else {
+                }
+            }
+        
+        path
+            .collection(Endpoints.DOCUMENT_ENDPOINT)
+            .document(newDoc.id)
+            .setData(data, merge: true)
+            { err in
+                if let err = err {
+                    print("Error writing document: \(err)")
+                }
+                else {
+                    path
+                        .updateData(["test" : FieldValue.delete()])
+                        { err in
+                            if let err = err {
+                                print("Error updating document: \(err)")
+                            } else {
+                            }
+                        }
+                    
+                }
+            }
+    }
+    
     func getDocuments() {
         
         newDocumentAuthor = CurrentUser.shared.currentUser.displayName
@@ -198,7 +281,7 @@ extension HomeViewModel {
     }
     
     func didClickCreateNew() {
-        let newDoc = Document(id: UUID().uuidString, saved: false, author: newDocumentAuthor, createdBy: CurrentUser.shared.currentUser.id, createdAt: Date(), title: newDocumentTitle, content: NSMutableAttributedString())
+        let newDoc = Document(id: UUID().uuidString, saved: false, author: newDocumentAuthor, createdBy: CurrentUser.shared.currentUser.id, createdAt: Date(), title: newDocumentTitle, content: NSMutableAttributedString(string: "What is Lorem Ipsum?Lorem Ipsum is simply dummy \n text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text eversince the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. \nIt has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. \nIt was popularised inthe 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum"))
         newDocumentTitle = "untitled"
         toDocCollaborationView(newDoc)
     }
