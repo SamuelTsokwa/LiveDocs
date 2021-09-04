@@ -10,7 +10,7 @@ Using SwiftUI and Firebase Firestore, this app allows users to create, edit , an
 
 ## Instructions
 * Clone this repository
-* OPen on Xcode
+* Open on Xcode
 * Change the signing credentials to your own credentials
 * Run the application
 
