@@ -53,7 +53,20 @@ These are only a handful of editing feayures available through the application. 
 
 
 ### Document Collaboration
+<p>
+  After creating a sharable link as described above, you may share it with another user of the app. They can paste the code into Safari or any notes application, when the click on they link in either of the aforementioned, they will be redirected to the livedocs.
+</p>
 
+Alternatively, to collaborate on a pre-existing document I created, use the following link : `livedocs://base?doc=vsnGORK0qPapR0jwrX0dgrIYWSx2&id=E20550E7-26EE-41CE-A271-906B2782B471` paste the link into Safari or any notes application, when they click on the link in either of the aforementioned, they will be redirected to the livedocs.
+
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/29356257/132108366-011f149e-428b-4e83-8bf6-9b3081c4c8cb.jpeg" width="240">
+</p>
+
+<p align="center">
+  Checking the collabration list shows an updated list of collaborators
+</p>
 
 
 
